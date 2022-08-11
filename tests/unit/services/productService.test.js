@@ -97,4 +97,33 @@ describe('Testes de productService', () => {
       });
     });
   });
+
+  describe('Quando adicionar um novo produto', () => {
+    describe('Se é adicionado com sucesso', () => {
+
+      before(() => {
+        const returned = { id: 1, name: 'Produto' }
+        sinon.stub(productModel, 'create').resolves(returned);
+      })
+
+      after(() => {
+        productModel.create.restore();
+      });
+
+      it('O retorno é um objeto', async () => {
+        const result = await productService.create('Produto');
+        expect(result).to.be.a('object');
+      })
+
+      it('O objeto contém a propriedade id', async () => {
+        const result = await productService.create('Produto');
+        expect(result).to.have.property('id');
+      });
+
+      it('O objeto contém a propriedade name', async () => {
+        const result = await productService.create('Produto');
+        expect(result).to.have.property('name');
+      });
+    });
+  });
 });

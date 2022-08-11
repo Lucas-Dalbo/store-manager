@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const productService = require('../../../services/productService');
 const productController = require('../../../controllers/productController');
+const productMidlleware = require('../../../middlewares/productMiddleware');
 
 describe('Testes de productController', () => {
   describe('Quando realizar uma busca por todos os produtos', () => {
@@ -78,7 +79,7 @@ describe('Testes de productController', () => {
         sinon.stub(productService, 'findById').resolves(false);
       })
 
-      after(async () => {
+      after(() => {
         productService.findById.restore();
       });
 
@@ -123,6 +124,85 @@ describe('Testes de productController', () => {
         await productController.findById(request, response);
         expect(response.json.calledWith(expectedReturn)).to.be.equal(true);
       })
+    });
+  });
+
+  describe('Quando adicionar um novo produto', () => {
+    describe('Caso o', () => {
+      describe('"name" é não fornecido', () => {
+        const response = {};
+        const request = {};
+        const next = () => {};
+
+        before(() => {
+          request.body = {};
+          response.status = sinon.stub().returns(response);
+          response.json = sinon.stub().returns();
+        });
+
+        it('status é chamado com o código 400', async () => {
+          await productMidlleware.nameValidation(request, response, next);
+          expect(response.status.calledWith(400)).to.be.true;
+        });
+
+        it('json é chamado com a mesagem de erro', async () => {
+          await productMidlleware.nameValidation(request, response, next);
+          const mss = { message: '"name" is required' };
+          expect(response.json.calledWith(mss)).to.be.true;
+        });
+
+        describe('"name" tem menos que 5 caracteres', () => {
+          const response = {};
+          const request = {};
+          const next = () => { };
+
+          before(() => {
+            request.body = { name: 'abc' };
+            response.status = sinon.stub().returns(response);
+            response.json = sinon.stub().returns();
+          });
+
+          it('status é chamado com o código 422', async () => {
+            await productMidlleware.nameValidation(request, response, next);
+            expect(response.status.calledWith(422)).to.be.true;
+          });
+
+          it('json é chamado com a mesagem de erro', async () => {
+            await productMidlleware.nameValidation(request, response, next);
+            const mss = { message: '"name" length must be at least 5 characters long' };
+            expect(response.json.calledWith(mss)).to.be.true;
+          });
+        });
+      });
+
+      describe('O "name" é fornecido corretamente', () => {
+        const expectedReturn = { id: 1, name: 'rivotril' }
+
+        const response = {};
+        const request = {};
+
+        before(() => {
+          request.body = { name: 'rivotril' };
+          response.status = sinon.stub().returns(response);
+          response.json = sinon.stub().returns();
+
+          sinon.stub(productService, 'create').resolves(expectedReturn);
+        });
+
+        after(() => {
+          productService.create.restore();
+        })
+
+        it('status é chamado com o código 201', async () => {
+          await productController.create(request, response);
+          expect(response.status.calledWith(201)).to.be.equal(true);
+        })
+
+        it('json é chamado com a array encontrada', async () => {
+          await productController.create(request, response);
+          expect(response.json.calledWith(expectedReturn)).to.be.equal(true);
+        });
+      });
     });
   });
 });

@@ -100,4 +100,33 @@ describe('Testes de productModel', () => {
       });
     });
   });
+
+  describe('Qando adicionar um novo produto', () => {
+    describe('Se é adicionado com sucesso', () => {
+
+      before(() => {
+        const returned = [{ insertedId: 1 }]
+        sinon.stub(connection, 'execute').resolves(returned);
+      })
+
+      after(() => {
+        connection.execute.restore();
+      });
+
+      it('O retorno é um objeto', async () => {
+        const result = await productModel.create('Produto');
+        expect(result).to.be.a('object');
+      })
+
+      it('O objeto contém a propriedade id', async () => {
+        const result = await productModel.create('Produto');
+        expect(result).to.have.property('id');
+      });
+
+      it('O objeto contém a propriedade name', async () => {
+        const result = await productModel.create('Produto');
+        expect(result).to.have.property('name');
+      });
+    });
+  });
 });
