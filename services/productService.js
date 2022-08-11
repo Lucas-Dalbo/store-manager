@@ -1,8 +1,16 @@
 const productModel = require('../models/productModel');
 
 const getAll = async () => {
-  const products = await productModel.getAll();
-  return products;
+  const produtos = await productModel.getAll();
+  return produtos;
 };
 
-module.exports = { getAll };
+const findById = async (id) => {
+  const produto = await productModel.findById(id);
+
+  if (!produto.length) return false;
+
+  return produto[0];
+};
+
+module.exports = { getAll, findById };
