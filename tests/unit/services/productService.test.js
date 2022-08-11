@@ -3,8 +3,29 @@ const sinon = require('sinon');
 const productModel = require('../../../models/productModel');
 const productService = require('../../../services/productService');
 
-describe('Testes de productModel', () => {
+describe('Testes de productService', () => {
   describe('Quando realizar uma busca por todos os produtos', () => {
+    describe('Se nenhum produto não for encontrado', () => {
+      const expectedReturn = [];
+
+      before(() => {
+        sinon.stub(productModel, 'getAll').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        productModel.getAll.restore();
+      });
+      it('Retorna um array', async () => {
+        const resultado = await productService.getAll();
+        expect(resultado).to.be.an('array');
+      });
+
+      it('O array está vazio', async () => {
+        const resultado = await productService.getAll();
+        expect(resultado).to.be.empty;
+      });
+    });
+
     describe('Se a requisição for um sucesso', () => {
       const expectedReturn = [
         { id: 1, name: 'Martelo de Thor' },
@@ -29,5 +50,51 @@ describe('Testes de productModel', () => {
         expect(resultado).to.be.equal(expectedReturn);
       })
     })
+  });
+
+  describe('Quando realizar uma busca por id', () => {
+    describe('Se o produto não for encontrado', () => {
+      const expectedReturn = [];
+
+      before(() => {
+        sinon.stub(productModel, 'findById').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        productModel.findById.restore();
+      });
+
+      it('Retorna um boleano', async () => {
+        const resultado = await productService.findById(8000);
+        expect(typeof resultado).to.be.equal('boolean');
+      });
+
+      it('Retorna false', async () => {
+        const resultado = await productService.findById(8000);
+        expect(resultado).to.be.false;
+      });
+    });
+
+    describe('Se o produto for encontrado', () => {
+      const expectedReturn = [{ id: 1, name: 'Martelo de Thor' }];
+
+      before(() => {
+        sinon.stub(productModel, 'findById').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        productModel.findById.restore();
+      });
+
+      it('Retorna um objeto', async () => {
+        const resultado = await productService.findById(1);
+        expect(resultado).to.be.an('object');
+      });
+
+      it('O produto é o Martelo de Thor', async () => {
+        const resultado = await productService.findById(1);
+        expect(resultado).to.be.equal(expectedReturn[0]);
+      });
+    });
   });
 });
