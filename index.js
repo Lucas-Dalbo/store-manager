@@ -2,6 +2,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const app = require('./app');
 const productRoute = require('./routes/productRoute');
+const salesRoute = require('./routes/salesRoute');
 
 // não altere esse arquivo, essa estrutura é necessária para à avaliação do projeto
 
@@ -12,3 +13,5 @@ app.listen(process.env.PORT, () => {
 app.use(bodyParser.json());
 
 app.use('/products', productRoute);
+
+app.use('/sales', salesRoute);
