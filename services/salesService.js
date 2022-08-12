@@ -14,7 +14,7 @@ const create = async (vendas) => {
 
   if (!isValid) return { message: 'Product not found' };
 
-  const newSaleId = await salesModel.create(vendas);
+  const newSaleId = await salesModel.create();
 
   await Promise.all(vendas.map((sale) => salesProductsModel.create(newSaleId, sale)));
 
@@ -24,4 +24,4 @@ const create = async (vendas) => {
   };
 };
 
-module.exports = { create };
+module.exports = { create, isProductValid };
