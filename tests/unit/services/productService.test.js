@@ -126,4 +126,50 @@ describe('Testes de productService', () => {
       });
     });
   });
+
+  describe('Quando atualizar um produto', () => {
+    describe('Se o produto não for encontrado', () => {
+      before(() => {
+        const product = []
+        sinon.stub(productModel, 'findById').resolves(product);
+      })
+
+      after(async () => {
+        productModel.findById.restore();
+      });
+
+      it('Retorna um boleano', async () => {
+        const resultado = await productService.update(8000, 'Produto');
+        expect(typeof resultado).to.be.equal('boolean');
+      });
+
+      it('Retorna false', async () => {
+        const resultado = await productService.update(8000, 'Produto');
+        expect(resultado).to.be.false;
+      });
+    });
+
+    describe('Se é atualizado com sucesso', () => {
+      const expectedReturned = { id: 1, name: 'Produto' }
+      before(() => {
+        const product = [{ id: 1, name: 'produtinho' }];
+        sinon.stub(productModel, 'findById').resolves(product);
+        sinon.stub(productModel, 'update').resolves(expectedReturned);
+      })
+
+      after(() => {
+        productModel.update.restore();
+      });
+
+      it('O retorno é um objeto', async () => {
+        const result = await productService.update(1, 'Produto');
+        expect(result).to.be.a('object');
+      })
+
+      it('O objeto contém o id e o novo nome', async () => {
+        const result = await productModel.update(1, 'Produto');
+        expect(result).to.be.deep.equal(expectedReturned);
+      });
+    });
+  });
 });

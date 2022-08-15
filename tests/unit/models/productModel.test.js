@@ -101,7 +101,7 @@ describe('Testes de productModel', () => {
     });
   });
 
-  describe('Qando adicionar um novo produto', () => {
+  describe('Quando adicionar um novo produto', () => {
     describe('Se é adicionado com sucesso', () => {
 
       before(() => {
@@ -126,6 +126,30 @@ describe('Testes de productModel', () => {
       it('O objeto contém a propriedade name', async () => {
         const result = await productModel.create('Produto');
         expect(result).to.have.property('name');
+      });
+    });
+  });
+
+  describe('Quando editar um produto existente', () => {
+    describe('Se houver sucesso', () => {
+      before(() => {
+        sinon.stub(connection, 'execute').resolves();
+      })
+
+      after(() => {
+        connection.execute.restore();
+      });
+
+      it('O retorno é um objeto', async () => {
+        const result = await productModel.update(1, 'Produto');
+        expect(result).to.be.a('object');
+      })
+
+      it('O objeto contém o id e o novo nome', async () => {
+        const updatedProduct = { id: 1, name: 'Produto' }
+
+        const result = await productModel.update(1, 'Produto');
+        expect(result).to.be.deep.equal(updatedProduct);
       });
     });
   });
