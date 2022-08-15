@@ -164,4 +164,132 @@ describe('Testes de salesController', () => {
       });
     });
   });
+
+  describe('Quando realizar uma busca por todas as vendas', () => {
+    describe('Se nenhuma venda for encontrada', () => {
+      const expectedReturn = [];
+
+      const response = {};
+      const request = {};
+
+      before(() => {
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(salesService, 'getAll').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesService.getAll.restore();
+      });
+
+      it('status é chamado com o código 404', async () => {
+        await salesController.getAll(request, response);
+
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+
+      it('send é chamado com a mensagem "Sales not found"', async () => {
+        await salesController.getAll(request, response);
+        const message = { message: 'Sales not found' };
+
+        expect(response.json.calledWith(message)).to.be.equal(true);
+      });
+    });
+
+    describe('Se a requisição for um sucesso', () => {
+      const expectedReturn = [
+        { saleId: 1, date: '2021-09-09T04:54:29.000Z', productId: 1, quantity: 2 },
+        { saleId: 1, date: '2021-09-09T04:54:54.000Z', productId: 2, quantity: 2 },
+        { saleId: 2, date: '2021-09-09T04:54:29.000Z', productId: 1, quantity: 3 },
+        { saleId: 2, date: '2021-09-09T04:54:54.000Z', productId: 2, quantity: 1 },
+      ];
+
+      const response = {};
+      const request = {};
+
+      before(() => {
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+
+        sinon.stub(salesService, 'getAll').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesService.getAll.restore();
+      });
+
+      it('status é chamado com o código 200', async () => {
+        await salesController.getAll(request, response);
+        expect(response.status.calledWith(200)).to.be.equal(true);
+      })
+
+      it('json é chamado com a array encontrada', async () => {
+        await salesController.getAll(request, response);
+        expect(response.json.calledWith(expectedReturn)).to.be.equal(true);
+      })
+    });
+  });
+
+  describe('Quando realizar uma busca por id', () => {
+    describe('Se a venda não for encontrada', () => {
+      const response = {};
+      const request = {};
+
+      before(() => {
+        request.params = { id: '8000' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(salesService, 'findById').resolves(false);
+      })
+
+      after(() => {
+        salesService.findById.restore();
+      });
+
+      it('status é chamado com o código 404', async () => {
+        await salesController.findById(request, response);
+
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+
+      it('send é chamado com a mensage de "Sale not found"', async () => {
+        await salesController.findById(request, response);
+        const message = { message: 'Sale not found' };
+
+        expect(response.json.calledWith(message)).to.be.equal(true);
+      });
+    });
+
+    describe('Se a venda for encontrada', () => {
+      const expectedReturn = [
+        { date: '2021-09-09T04:54:29.000Z', productId: 1, quantity: 2 },
+        { date: '2021-09-09T04:54:54.000Z', productId: 2, quantity: 2 },
+      ];
+
+      const response = {};
+      const request = {};
+
+      before(() => {
+        request.params = { id: '1' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+
+        sinon.stub(salesService, 'findById').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesService.findById.restore();
+      });
+
+      it('status é chamado com o código 200', async () => {
+        await salesController.findById(request, response);
+        expect(response.status.calledWith(200)).to.be.equal(true);
+      })
+
+      it('json é chamado com a array encontrada', async () => {
+        await salesController.findById(request, response);
+        expect(response.json.calledWith(expectedReturn)).to.be.equal(true);
+      })
+    });
+  });
 });

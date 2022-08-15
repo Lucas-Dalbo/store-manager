@@ -15,6 +15,21 @@ const validateQuantity = (sale) => {
   return false;
 };
 
+const saleValidation = (req, res, next) => {
+  const sale = req.body;
+  if (!sale[0]) return res.status(400).json({ message: 'Invalid body json' });
+
+  const invalidData = validateData(sale);
+  if (invalidData) return res.status(400).json({ message: invalidData });
+
+  const invalidQuantity = validateQuantity(sale);
+  if (invalidQuantity) return res.status(422).json({ message: invalidQuantity });
+
+  next();
+};
+
+module.exports = { saleValidation };
+
 // const validateItens = (sale) => {
 //   const shema = Joi.array().items({
 //     productId: Joi.number(),
@@ -32,18 +47,3 @@ const validateQuantity = (sale) => {
 //   const { error } = shema.validate(sale);
 //   return error;
 // };
-
-const saleValidation = (req, res, next) => {
-  const sale = req.body;
-  if (!sale[0]) return res.status(400).json({ message: 'Invalid body json' });
-
-  const invalidData = validateData(sale);
-  if (invalidData) return res.status(400).json({ message: invalidData });
-
-  const invalidQuantity = validateQuantity(sale);
-  if (invalidQuantity) return res.status(422).json({ message: invalidQuantity });
-
-  next();
-};
-
-module.exports = { saleValidation };

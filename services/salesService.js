@@ -24,4 +24,17 @@ const create = async (vendas) => {
   };
 };
 
-module.exports = { create, isProductValid };
+const getAll = async () => {
+  const vendas = await salesModel.getAll();
+  return vendas;
+};
+
+const findById = async (id) => {
+  const venda = await salesModel.findById(id);
+
+  if (!venda.length) return false;
+
+  return venda;
+};
+
+module.exports = { create, isProductValid, getAll, findById };

@@ -2,7 +2,6 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const productModel = require('../../../models/productModel');
 const salesModel = require('../../../models/salesModel');
-const salesProductsModel = require('../../../models/salesProductsModel');
 const salesService = require('../../../services/salesService');
 
 describe('Testes de salesService', () => {
@@ -67,4 +66,104 @@ describe('Testes de salesService', () => {
       });
     });
   });
+
+  describe('Quando realizar uma busca por todas as vendas', () => {
+    describe('Se nenhuma venda não for encontrada', () => {
+      const expectedReturn = [];
+
+      before(() => {
+        sinon.stub(salesModel, 'getAll').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesModel.getAll.restore();
+      });
+      it('Retorna um array', async () => {
+        const resultado = await salesService.getAll();
+        expect(resultado).to.be.an('array');
+      });
+
+      it('O array está vazio', async () => {
+        const resultado = await salesService.getAll();
+        expect(resultado).to.be.empty;
+      });
+    });
+
+    describe('Se a requisição for um sucesso', () => {
+      const expectedReturn = [
+        { saleId: 1, date: '2021-09-09T04:54:29.000Z', productId: 1, quantity: 2 },
+        { saleId: 1, date: '2021-09-09T04:54:54.000Z', productId: 2, quantity: 2 },
+        { saleId: 2, date: '2021-09-09T04:54:29.000Z', productId: 1, quantity: 3 },
+        { saleId: 2, date: '2021-09-09T04:54:54.000Z', productId: 2, quantity: 1 },
+      ];
+
+      before(() => {
+        sinon.stub(salesModel, 'getAll').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesModel.getAll.restore();
+      });
+
+      it('O retorno é um array', async () => {
+        const resultado = await salesService.getAll();
+        expect(resultado).to.be.an('array');
+      })
+
+      it('Os elementos da array são objetos', async () => {
+        const resultado = await salesService.getAll();
+        expect(resultado).to.be.equal(expectedReturn);
+      })
+    })
+  });
+
+  describe('Quando realizar uma busca por id', () => {
+    describe('Se a venda não for encontrada', () => {
+      const expectedReturn = [];
+
+      before(() => {
+        sinon.stub(salesModel, 'findById').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesModel.findById.restore();
+      });
+
+      it('Retorna um boleano', async () => {
+        const resultado = await salesService.findById(8000);
+        expect(typeof resultado).to.be.equal('boolean');
+      });
+
+      it('Retorna false', async () => {
+        const resultado = await salesService.findById(8000);
+        expect(resultado).to.be.false;
+      });
+    });
+
+    describe('Se a venda for encontrada', () => {
+      const expectedReturn = [
+        { date: '2021-09-09T04:54:29.000Z', productId: 1, quantity: 2 },
+        { date: '2021-09-09T04:54:54.000Z', productId: 2, quantity: 2 },
+      ];
+
+      before(() => {
+        sinon.stub(salesModel, 'findById').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        salesModel.findById.restore();
+      });
+
+      it('Retorna um array', async () => {
+        const resultado = await salesService.findById(1);
+        expect(resultado).to.be.an('array');
+      });
+
+      it('A venda resultante é igual a expectedReturn', async () => {
+        const resultado = await salesService.findById(1);
+        expect(resultado).to.be.equal(expectedReturn);
+      });
+    });
+  });
+  
 });
