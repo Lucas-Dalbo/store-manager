@@ -7,4 +7,11 @@ const create = async (id, sale) => {
   );
 };
 
-module.exports = { create };
+const remove = async (id) => {
+  await connection.execute(
+    'DELETE FROM StoreManager.sales_products WHERE sale_id = ?;',
+    [id],
+  );
+};
+
+module.exports = { create, remove };

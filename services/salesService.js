@@ -45,4 +45,18 @@ const remove = async (id) => {
   return true;
 };
 
-module.exports = { create, isProductValid, getAll, findById, remove };
+const update = async (id, newData) => {
+  const isValid = await isProductValid(newData);
+  if (!isValid) return { message: 'Product not found' };
+
+  const isSaleValid = await salesModel.findById(id);
+  if (!isSaleValid.length) return { message: 'Sale not found' };
+
+  await salesProductsModel.remove(id);
+
+  await Promise.all(newData.map((sale) => salesProductsModel.create(id, sale)));
+
+  return { saleId: Number(id), itemsUpdated: [...newData] };
+};
+
+module.exports = { create, isProductValid, getAll, findById, remove, update };

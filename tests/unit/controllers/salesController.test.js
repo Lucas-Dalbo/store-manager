@@ -75,7 +75,7 @@ describe('Testes de salesController', () => {
         expect(response.status.calledWith(404)).to.be.true;
       });
 
-      it('json é chamado com o objeto da venda', async () => {
+      it('json é chamado com o objeto de erro', async () => {
         await salesController.create(request, response, next);
         expect(response.json.calledWith(expectedResult)).to.be.true;
       });
@@ -346,6 +346,199 @@ describe('Testes de salesController', () => {
       it('end é chamada com uma mensagem vazia', async () => {
         await salesController.remove(request, response);
         expect(response.end.calledWith()).to.be.equal(true);
+      });
+    });
+  });
+
+  describe('Quando atualizar uma venda', () => {
+    describe('Se não houverem informações', () => {
+      const request = {};
+      const response = {};
+      const next = () => { };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = {};
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+      });
+
+      it('status é chamado com o código 400', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        expect(response.status.calledWith(400)).to.be.true;
+      });
+
+      it('json é chamado com a mesagem de erro', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        const mss = { message: 'Invalid body json' };
+        expect(response.json.calledWith(mss)).to.be.true;
+      });
+    });
+
+    describe('Se productId for inválido', () => {
+      const request = {};
+      const response = {};
+      const next = () => { };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = [{ quantity: 5 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+      });
+
+      it('status é chamado com o código 400', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        expect(response.status.calledWith(400)).to.be.true;
+      });
+
+      it('json é chamado com a mesagem de erro', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        const mss = { message: '"productId" is required' };
+        expect(response.json.calledWith(mss)).to.be.true;
+      });
+    });
+
+    describe('Se productId não exitir no banco', () => {
+      const request = {};
+      const response = {};
+
+      const expectedResult = { message: 'Product not found' };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = [{ productId: 80, quantity: 1 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+        sinon.stub(salesService, 'update').resolves(expectedResult);
+      });
+
+      after(() => {
+        salesService.update.restore();
+      })
+
+      it('status é chamado com o código 404', async () => {
+        await salesController.update(request, response);
+        expect(response.status.calledWith(404)).to.be.true;
+      });
+
+      it('json é chamado com a mesnagem de erro', async () => {
+        await salesController.update(request, response);
+        expect(response.json.calledWith(expectedResult)).to.be.true;
+      });
+    });
+
+    describe('Se quantity for inválido', () => {
+      const request = {};
+      const response = {};
+      const next = () => { };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = [{ productId: 5 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+      });
+
+      it('status é chamado com o código 400', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        expect(response.status.calledWith(400)).to.be.true;
+      });
+
+      it('json é chamado com a mesagem de erro', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        const mss = { message: '"quantity" is required' };
+        expect(response.json.calledWith(mss)).to.be.true;
+      });
+    });
+
+    describe('Se quantity for menor que 1', () => {
+      const request = {};
+      const response = {};
+      const next = () => { };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = [{ productId: 1, quantity: 0 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+      });
+
+      it('status é chamado com o código 422', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        expect(response.status.calledWith(422)).to.be.true;
+      });
+
+      it('json é chamado com a mesagem de erro', async () => {
+        await salesMiddleware.saleValidation(request, response, next);
+        const mss = { message: '"quantity" must be greater than or equal to 1' };
+        expect(response.json.calledWith(mss)).to.be.true;
+      });
+    });
+
+    describe('Se a venda não existir no banco', () => {
+      const request = {};
+      const response = {};
+
+      const expectedResult = { message: 'Sale not found' };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = [{ productId: 80, quantity: 1 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+        sinon.stub(salesService, 'update').resolves(expectedResult);
+      });
+
+      after(() => {
+        salesService.update.restore();
+      })
+
+      it('status é chamado com o código 404', async () => {
+        await salesController.update(request, response);
+        expect(response.status.calledWith(404)).to.be.true;
+      });
+
+      it('json é chamado com o objeto de erro', async () => {
+        await salesController.update(request, response);
+        expect(response.json.calledWith(expectedResult)).to.be.true;
+      });
+    });
+
+    describe('Se as informações estiverem corretas', () => {
+      const request = {};
+      const response = {};
+
+      const expectedResult = {
+        id: 1,
+        itemsUpdated: [
+          {
+            productId: 1,
+            quantity: 1,
+          }
+        ]
+      };
+
+      before(() => {
+        request.params = { id: '1' };
+        request.body = [{ productId: 1, quantity: 1 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns(response);
+        sinon.stub(salesService, 'update').resolves(expectedResult);
+      });
+
+      after(() => {
+        salesService.update.restore();
+      })
+
+      it('status é chamado com o código 200', async () => {
+        await salesController.update(request, response);
+        expect(response.status.calledWith(200)).to.be.true;
+      });
+
+      it('json é chamado com o objeto da venda', async () => {
+        await salesController.update(request, response);
+        expect(response.json.calledWith(expectedResult)).to.be.true;
       });
     });
   });

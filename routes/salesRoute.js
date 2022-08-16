@@ -4,12 +4,13 @@ const salesMidlleware = require('../middlewares/salesMiddleware');
 
 const salesRoute = express.Router();
 
-salesRoute.post('/', salesMidlleware.saleValidation, salesController.create);
-
 salesRoute.get('/', salesController.getAll);
-
 salesRoute.get('/:id', salesController.findById);
-
 salesRoute.delete('/:id', salesController.remove);
+
+salesRoute.use(salesMidlleware.saleValidation);
+
+salesRoute.post('/', salesController.create);
+salesRoute.put('/:id', salesController.update);
 
 module.exports = salesRoute;

@@ -132,7 +132,7 @@ describe('Testes de salesModel', () => {
   });
 
   describe('Quando deletar uma venda', () => {
-    describe('Se a venda for encontrada', () => {
+    describe('Se a venda não for encontrada', () => {
       before(() => {
         const returned = [{ affectedRows: 0 }]
         sinon.stub(connection, 'execute').resolves(returned);
