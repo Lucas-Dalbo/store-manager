@@ -165,5 +165,48 @@ describe('Testes de salesService', () => {
       });
     });
   });
-  
+
+  describe('Quando deletar uma venda', () => {
+    describe('Se a venda for encontrada', () => {
+      before(() => {
+        const returned = 0;
+        sinon.stub(salesModel, 'remove').resolves(returned);
+      })
+
+      after(() => {
+        salesModel.remove.restore();
+      });
+
+      it('O retorno é um boleano', async () => {
+        const result = await salesService.remove(8000);
+        expect(result).to.be.a('boolean');
+      });
+
+      it('O boleano é false', async () => {
+        const result = await salesService.remove(8000);
+        expect(result).to.be.equal(false);
+      });
+    });
+
+    describe('Se a venda foi encontrada e deletada', () => {
+      before(() => {
+        const returned = 1;
+        sinon.stub(salesModel, 'remove').resolves(returned);
+      })
+
+      after(() => {
+        salesModel.remove.restore();
+      });
+
+      it('O retorno é um bolenao', async () => {
+        const result = await salesService.remove(22);
+        expect(result).to.be.a('boolean');
+      });
+
+      it('O boleano é true', async () => {
+        const result = await salesService.remove(22);
+        expect(result).to.be.equal(true);
+      });
+    });
+  });
 });

@@ -37,4 +37,12 @@ const findById = async (id) => {
   return venda;
 };
 
-module.exports = { create, isProductValid, getAll, findById };
+const remove = async (id) => {
+  const result = await salesModel.remove(id);
+
+  if (!result) return false;
+
+  return true;
+};
+
+module.exports = { create, isProductValid, getAll, findById, remove };

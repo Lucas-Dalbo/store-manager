@@ -160,7 +160,7 @@ describe('Testes de productModel', () => {
       before(() => {
         const returned = [{ affectedRows: 0 }]
         sinon.stub(connection, 'execute').resolves(returned);
-      })
+      });
 
       after(() => {
         connection.execute.restore();

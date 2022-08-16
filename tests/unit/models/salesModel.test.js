@@ -130,4 +130,48 @@ describe('Testes de salesModel', () => {
       });
     });
   });
+
+  describe('Quando deletar uma venda', () => {
+    describe('Se a venda for encontrada', () => {
+      before(() => {
+        const returned = [{ affectedRows: 0 }]
+        sinon.stub(connection, 'execute').resolves(returned);
+      });
+
+      after(() => {
+        connection.execute.restore();
+      });
+
+      it('O retorno é um number', async () => {
+        const result = await salesModel.remove(8000);
+        expect(result).to.be.a('number');
+      });
+
+      it('O number tem valor 0', async () => {
+        const result = await salesModel.remove(8000);
+        expect(result).to.be.equal(0);
+      });
+    });
+
+    describe('Se a venda for encontrada e deletada', () => {
+      before(() => {
+        const returned = [{ affectedRows: 1 }]
+        sinon.stub(connection, 'execute').resolves(returned);
+      })
+
+      after(() => {
+        connection.execute.restore();
+      });
+
+      it('O retorno é um number', async () => {
+        const result = await salesModel.remove(22);
+        expect(result).to.be.a('number');
+      });
+
+      it('O number tem valor 1', async () => {
+        const result = await salesModel.remove(22);
+        expect(result).to.be.equal(1);
+      });
+    });
+  });
 });

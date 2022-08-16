@@ -292,4 +292,61 @@ describe('Testes de salesController', () => {
       })
     });
   });
+
+  describe('Quando deletar uma venda', () => {
+    describe('Se a venda não for encontrada', () => {
+      const response = {};
+      const request = {};
+
+      before(() => {
+        request.params = { id: '8000' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(salesService, 'remove').resolves(false);
+      })
+
+      after(() => {
+        salesService.remove.restore();
+      });
+
+      it('status é chamado com o código 404', async () => {
+        await salesController.remove(request, response);
+
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+
+      it('send é chamado com a mensage de "Sale not found"', async () => {
+        await salesController.remove(request, response);
+        const message = { message: 'Sale not found' };
+
+        expect(response.json.calledWith(message)).to.be.equal(true);
+      });
+    });
+
+    describe('Se a venda for encontrada e deletada', () => {
+      const request = {};
+      const response = {};
+
+      before(() => {
+        request.params = { id: '22' };
+        response.status = sinon.stub().returns(response);
+        response.end = sinon.stub().returns();
+        sinon.stub(salesService, 'remove').resolves(true);
+      });
+
+      after(() => {
+        salesService.remove.restore();
+      });
+
+      it('status é chamada com o código 204', async () => {
+        await salesController.remove(request, response);
+        expect(response.status.calledWith(204)).to.be.equal(true);
+      });
+
+      it('end é chamada com uma mensagem vazia', async () => {
+        await salesController.remove(request, response);
+        expect(response.end.calledWith()).to.be.equal(true);
+      });
+    });
+  });
 });

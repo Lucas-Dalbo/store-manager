@@ -367,7 +367,7 @@ describe('Testes de productController', () => {
         expect(response.status.calledWith(204)).to.be.equal(true);
       });
 
-      it('end é chamada com uma mesnagem vazia', async () => {
+      it('end é chamada com uma mensagem vazia', async () => {
         await productController.remove(request, response);
         expect(response.end.calledWith()).to.be.equal(true);
       });

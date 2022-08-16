@@ -26,4 +26,13 @@ const findById = async (req, res) => {
   res.status(200).json(venda);
 };
 
-module.exports = { create, getAll, findById };
+const remove = async (req, res) => {
+  const { id } = req.params;
+  const result = await salesService.remove(id);
+
+  if (!result) return res.status(404).json({ message: 'Sale not found' });
+
+  return res.status(204).end();
+};
+
+module.exports = { create, getAll, findById, remove };
