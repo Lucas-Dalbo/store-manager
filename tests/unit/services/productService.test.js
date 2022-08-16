@@ -172,4 +172,48 @@ describe('Testes de productService', () => {
       });
     });
   });
+
+  describe('Quando deletar um produto', () => {
+    describe('Se o produto não existir', () => {
+      before(() => {
+        const returned = 0;
+        sinon.stub(productModel, 'remove').resolves(returned);
+      })
+
+      after(() => {
+        productModel.remove.restore();
+      });
+
+      it('O retorno é um boleano', async () => {
+        const result = await productService.remove(8000);
+        expect(result).to.be.a('boolean');
+      });
+
+      it('O boleano é false', async () => {
+        const result = await productService.remove(8000);
+        expect(result).to.be.equal(false);
+      });
+    });
+
+    describe('Se o produto existia e foi deletado', () => {
+      before(() => {
+        const returned = 1;
+        sinon.stub(productModel, 'remove').resolves(returned);
+      })
+
+      after(() => {
+        productModel.remove.restore();
+      });
+
+      it('O retorno é um bolenao', async () => {
+        const result = await productService.remove(22);
+        expect(result).to.be.a('boolean');
+      });
+
+      it('O boleano é true', async () => {
+        const result = await productService.remove(22);
+        expect(result).to.be.equal(true);
+      });
+    });
+  });
 });

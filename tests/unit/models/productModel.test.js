@@ -62,6 +62,7 @@ describe('Testes de productModel', () => {
       after(async () => {
         connection.execute.restore();
       });
+
       it('Retorna um array', async () => {
         const resultado = await productModel.findById(8000);
         expect(resultado).to.be.an('array');
@@ -150,6 +151,50 @@ describe('Testes de productModel', () => {
 
         const result = await productModel.update(1, 'Produto');
         expect(result).to.be.deep.equal(updatedProduct);
+      });
+    });
+  });
+
+  describe('Quando deletar um produto', () => {
+    describe('Se o produto não existir', () => {
+      before(() => {
+        const returned = [{ affectedRows: 0 }]
+        sinon.stub(connection, 'execute').resolves(returned);
+      })
+
+      after(() => {
+        connection.execute.restore();
+      });
+
+      it('O retorno é um number', async () => {
+        const result = await productModel.remove(8000);
+        expect(result).to.be.a('number');
+      });
+
+      it('O number tem valor 0', async () => {
+        const result = await productModel.remove(8000);
+        expect(result).to.be.equal(0);
+      });
+    });
+
+    describe('Se o produto existia e foi deletado', () => {
+      before(() => {
+        const returned = [{ affectedRows: 1 }]
+        sinon.stub(connection, 'execute').resolves(returned);
+      })
+
+      after(() => {
+        connection.execute.restore();
+      });
+
+      it('O retorno é um number', async () => {
+        const result = await productModel.remove(22);
+        expect(result).to.be.a('number');
+      });
+
+      it('O number tem valor 1', async () => {
+        const result = await productModel.remove(22);
+        expect(result).to.be.equal(1);
       });
     });
   });

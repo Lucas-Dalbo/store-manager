@@ -317,4 +317,60 @@ describe('Testes de productController', () => {
       });
     });
   });
+
+  describe('Quando deletar um produto', () => {
+    describe('Se o produto não for encontrado', () => {
+      const response = {};
+      const request = {};
+
+      before(() => {
+        request.params = { id: '8000' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(productService, 'remove').resolves(false);
+      })
+
+      after(() => {
+        productService.remove.restore();
+      });
+
+      it('status é chamado com o código 404', async () => {
+        await productController.remove(request, response);
+
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+
+      it('send é chamado com a mensage de "Product not found"', async () => {
+        await productController.remove(request, response);
+        const message = { message: 'Product not found' };
+
+        expect(response.json.calledWith(message)).to.be.equal(true);
+      });
+    });
+    describe('Se o produto foi encontrado e deletado', () => {
+      const request = {};
+      const response = {};
+
+      before(() => {
+        request.params = { id: '22' };
+        response.status = sinon.stub().returns(response);
+        response.end = sinon.stub().returns();
+        sinon.stub(productService, 'remove').resolves(true);
+      });
+
+      after(() => {
+        productService.remove.restore();
+      });
+
+      it('status é chamada com o código 204', async () => {
+        await productController.remove(request, response);
+        expect(response.status.calledWith(204)).to.be.equal(true);
+      });
+
+      it('end é chamada com uma mesnagem vazia', async () => {
+        await productController.remove(request, response);
+        expect(response.end.calledWith()).to.be.equal(true);
+      });
+    });
+  });
 });

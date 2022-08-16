@@ -6,6 +6,7 @@ const productRoute = express.Router();
 
 productRoute.get('/', productController.getAll);
 productRoute.get('/:id', productController.findById);
+productRoute.delete('/:id', productController.remove);
 
 productRoute.use(productMiddleware.nameValidation);
 
