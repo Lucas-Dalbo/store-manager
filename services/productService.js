@@ -33,4 +33,10 @@ const remove = async (id) => {
   return true;
 };
 
-module.exports = { getAll, findById, create, update, remove };
+const findByName = async (query) => {
+  const produto = await productModel.findByName(query);
+
+  return produto;
+};
+
+module.exports = { getAll, findById, create, update, remove, findByName };

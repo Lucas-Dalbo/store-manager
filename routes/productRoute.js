@@ -5,6 +5,7 @@ const productMiddleware = require('../middlewares/productMiddleware');
 const productRoute = express.Router();
 
 productRoute.get('/', productController.getAll);
+productRoute.get('/search', productController.findByName);
 productRoute.get('/:id', productController.findById);
 productRoute.delete('/:id', productController.remove);
 

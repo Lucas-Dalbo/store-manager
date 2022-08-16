@@ -73,6 +73,7 @@ describe('Testes de productModel', () => {
         expect(resultado).to.be.empty;
       });
     });
+
     describe('Se o produto for encontrado', () => {
       const expectedReturn = [[{ id: 1, name: 'Martelo de Thor' }]];
 
@@ -195,6 +196,52 @@ describe('Testes de productModel', () => {
       it('O number tem valor 1', async () => {
         const result = await productModel.remove(22);
         expect(result).to.be.equal(1);
+      });
+    });
+  });
+
+  describe('Quando realizar uma busca por nome', () => {
+    describe('Se o produto não for encontrado', () => {
+      const expectedReturn = [[], []];
+
+      before(() => {
+        sinon.stub(connection, 'execute').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        connection.execute.restore();
+      });
+
+      it('Retorna um array', async () => {
+        const resultado = await productModel.findByName('produto');
+        expect(resultado).to.be.an('array');
+      });
+
+      it('O array está vazio', async () => {
+        const resultado = await productModel.findByName('produto');
+        expect(resultado).to.be.empty;
+      });
+    });
+
+    describe('Se o produto for encontrado', () => {
+      const expectedReturn = [[{ id: 1, name: 'Martelo de Thor' }]];
+
+      before(() => {
+        sinon.stub(connection, 'execute').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        connection.execute.restore();
+      });
+
+      it('Retorna um array', async () => {
+        const resultado = await productModel.findByName('Martelo');
+        expect(resultado).to.be.an('array');
+      });
+
+      it('O produto é o Martelo de Thor', async () => {
+        const resultado = await productModel.findByName('Martelo');
+        expect(resultado).to.be.equal(expectedReturn[0]);
       });
     });
   });

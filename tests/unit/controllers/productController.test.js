@@ -347,6 +347,7 @@ describe('Testes de productController', () => {
         expect(response.json.calledWith(message)).to.be.equal(true);
       });
     });
+
     describe('Se o produto foi encontrado e deletado', () => {
       const request = {};
       const response = {};
@@ -371,6 +372,66 @@ describe('Testes de productController', () => {
         await productController.remove(request, response);
         expect(response.end.calledWith()).to.be.equal(true);
       });
+    });
+  });
+
+  describe('Quando realizar uma busca por nome', () => {
+    describe('Se nenhum produto for encontrado', () => {
+      const response = {};
+      const request = {};
+
+      before(() => {
+        request.query = { q: 'casa' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(productService, 'findByName').resolves(false);
+      })
+
+      after(() => {
+        productService.findByName.restore();
+      });
+
+      it('status é chamado com o código 404', async () => {
+        await productController.findByName(request, response);
+
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+
+      it('send é chamado com a mensage de "Product not found"', async () => {
+        await productController.findByName(request, response);
+        const message = { message: 'Product not found' };
+
+        expect(response.json.calledWith(message)).to.be.equal(true);
+      });
+    });
+
+    describe('Se algum produto for encontrado', () => {
+      const expectedReturn = [{ id: 1, name: 'Martelo de Thor' }]
+
+      const response = {};
+      const request = {};
+
+      before(() => {
+        request.query = { q: 'Martelo' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+
+        sinon.stub(productService, 'findByName').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        productService.findByName.restore();
+      });
+
+      it('status é chamado com o código 200', async () => {
+        await productController.findByName(request, response);
+        expect(response.status.calledWith(200)).to.be.equal(true);
+      })
+
+      it('json é chamado com a array encontrada', async () => {
+        await productController.findByName(request, response);
+        expect(response.json.calledWith(expectedReturn)).to.be.equal(true);
+      })
     });
   });
 });

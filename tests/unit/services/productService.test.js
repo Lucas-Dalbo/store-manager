@@ -216,4 +216,50 @@ describe('Testes de productService', () => {
       });
     });
   });
+
+  describe('Quando realizar uma busca por nome', () => {
+    describe('Se o produto não for encontrado', () => {
+      const expectedReturn = [];
+
+      before(() => {
+        sinon.stub(productModel, 'findByName').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        productModel.findByName.restore();
+      });
+
+      it('Retorna um array', async () => {
+        const resultado = await productService.findByName('produto');
+        expect(resultado).to.be.an('array');
+      });
+
+      it('O array está vazio', async () => {
+        const resultado = await productService.findByName('produto');
+        expect(resultado).to.be.empty;
+      });
+    });
+
+    describe('Se o produto for encontrado', () => {
+      const expectedReturn = [{ id: 1, name: 'Martelo de Thor' }];
+
+      before(() => {
+        sinon.stub(productModel, 'findByName').resolves(expectedReturn);
+      })
+
+      after(async () => {
+        productModel.findByName.restore();
+      });
+
+      it('Retorna um array', async () => {
+        const resultado = await productService.findByName('Martelo');
+        expect(resultado).to.be.an('array');
+      });
+
+      it('O produto é o Martelo de Thor', async () => {
+        const resultado = await productService.findByName('Martelo');
+        expect(resultado).to.be.equal(expectedReturn);
+      });
+    });
+  });
 });
